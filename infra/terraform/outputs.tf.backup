@@ -1,7 +1,0 @@
-output "droplet_ip" {
-  value = digitalocean_reserved_ip.agriops_ip.ip_address
-}
-
-output "spaces_bucket_name" {
-  value = digitalocean_spaces_bucket.agriops_media.name
-}
