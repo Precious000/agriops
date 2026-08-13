@@ -1,0 +1,21 @@
+variable "do_token" {
+  description = "DigitalOcean API token"
+  type        = string
+  sensitive   = true
+}
+
+variable "region" {
+  default = "fra1" # pick nearest region; fra1, nyc1, sgp1 etc.
+}
+
+variable "droplet_size" {
+  default = "s-2vcpu-4gb" # good baseline for Compose stack with monitoring
+}
+
+variable "ssh_public_key_path" {
+  default = "~/.ssh/agriops_do.pub"
+}
+
+variable "environment" {
+  default = "prod"
+}

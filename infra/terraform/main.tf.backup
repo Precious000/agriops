@@ -1,0 +1,65 @@
+resource "digitalocean_ssh_key" "agriops_key" {
+  name       = "agriops-${var.environment}-key"
+  public_key = file(var.ssh_public_key_path)
+}
+
+resource "digitalocean_vpc" "agriops_vpc" {
+  name     = "agriops-${var.environment}-vpc"
+  region   = var.region
+  ip_range = "10.10.10.0/24"
+}
+
+resource "digitalocean_droplet" "agriops_droplet" {
+  name     = "agriops-${var.environment}-droplet"
+  region   = var.region
+  size     = var.droplet_size
+  image    = "ubuntu-24-04-x64"
+  vpc_uuid = digitalocean_vpc.agriops_vpc.id
+  ssh_keys = [digitalocean_ssh_key.agriops_key.fingerprint]
+
+  tags = ["agriops", var.environment]
+}
+
+resource "digitalocean_firewall" "agriops_fw" {
+  name = "agriops-${var.environment}-fw"
+
+  droplet_ids = [digitalocean_droplet.agriops_droplet.id]
+
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "22"
+    source_addresses = ["0.0.0.0/0", "::/0"] # tighten to your IP once you have it
+  }
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "80"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+  inbound_rule {
+    protocol         = "tcp"
+    port_range       = "443"
+    source_addresses = ["0.0.0.0/0", "::/0"]
+  }
+
+  outbound_rule {
+    protocol              = "tcp"
+    port_range            = "1-65535"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+  outbound_rule {
+    protocol              = "udp"
+    port_range             = "1-65535"
+    destination_addresses = ["0.0.0.0/0", "::/0"]
+  }
+}
+
+resource "digitalocean_spaces_bucket" "agriops_media" {
+  name   = "agriops-${var.environment}-media"
+  region = var.region
+  acl    = "private"
+}
+
+resource "digitalocean_reserved_ip" "agriops_ip" {
+  droplet_id = digitalocean_droplet.agriops_droplet.id
+  region     = var.region
+}
