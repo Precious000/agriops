@@ -46,10 +46,36 @@ function authenticate(req, res, next) {
   }
 }
 
+function authorize(...allowedRoles) {
+  return (req, res, next) => {
+    if (!allowedRoles.includes(req.user.role)) {
+      return res.status(403).json({ error: 'Forbidden: insufficient role' });
+    }
+    next();
+  };
+}
+
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'orders-api' }));
 
 app.get('/listings', async (req, res) => {
   const [rows] = await pool.query('SELECT * FROM produce_listings WHERE available = TRUE');
+  res.json(rows);
+});
+
+app.post('/listings', authenticate, authorize('manager', 'admin'), async (req, res) => {
+  const { plot_id, crop, quantity_kg, price_per_kg } = req.body;
+  if (!plot_id || !crop || !quantity_kg || !price_per_kg) {
+    return res.status(400).json({ error: 'Missing required fields' });
+  }
+  const [result] = await pool.query(
+    'INSERT INTO produce_listings (plot_id, crop, quantity_kg, price_per_kg) VALUES (?, ?, ?, ?)',
+    [plot_id, crop, quantity_kg, price_per_kg]
+  );
+  res.status(201).json({ id: result.insertId, plot_id, crop, quantity_kg, price_per_kg, available: true });
+});
+
+app.get('/listings/all', authenticate, authorize('manager', 'admin'), async (req, res) => {
+  const [rows] = await pool.query('SELECT * FROM produce_listings ORDER BY id DESC');
   res.json(rows);
 });
 

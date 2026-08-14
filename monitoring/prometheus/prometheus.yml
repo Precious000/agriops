@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 15s
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["alertmanager:9093"]
+
+scrape_configs:
+  - job_name: 'users-api'
+    static_configs: [{ targets: ['users-api:4000'] }]
+  - job_name: 'farms-api'
+    static_configs: [{ targets: ['farms-api:4001'] }]
+  - job_name: 'orders-api'
+    static_configs: [{ targets: ['orders-api:4002'] }]

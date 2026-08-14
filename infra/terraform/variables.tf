@@ -7,7 +7,7 @@ variable "do_token" {
 variable "region" {
   description = "DigitalOcean region"
   type        = string
-  default     = "nyc1"
+  default     = "nyc3"
 }
 
 variable "droplet_size" {
@@ -26,4 +26,15 @@ variable "environment" {
   description = "Deployment environment"
   type        = string
   default     = "prod"
+}
+variable "spaces_access_id" {
+  description = "DigitalOcean Spaces access key"
+  type        = string
+  sensitive   = true
+}
+
+variable "spaces_secret_key" {
+  description = "DigitalOcean Spaces secret key"
+  type        = string
+  sensitive   = true
 }

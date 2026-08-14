@@ -64,6 +64,16 @@ app.post('/plots', authenticate, async (req, res) => {
   res.status(201).json({ id: result.insertId });
 });
 
+app.get('/plots', authenticate, async (req, res) => {
+  const [rows] = await pool.query(
+    `SELECT plots.* FROM plots
+     JOIN farms ON plots.farm_id = farms.id
+     WHERE farms.owner_id = ?`,
+    [req.user.id]
+  );
+  res.json(rows);
+});
+
 app.post('/tasks', authenticate, async (req, res) => {
   const { plot_id, assigned_to, task_type, due_date } = req.body;
   const [result] = await pool.query(

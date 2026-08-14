@@ -1,5 +1,5 @@
 resource "digitalocean_droplet" "agriops_droplet" {
-  name   = "ubuntu-s-1vcpu-512mb-10gb-nyc1"
+  name   = "ubuntu-s-1vcpu-512mb-10gb-nyc3"
   region = var.region
   size   = var.droplet_size
   image  = "ubuntu-24-04-x64"
@@ -10,9 +10,7 @@ resource "digitalocean_droplet" "agriops_droplet" {
 resource "digitalocean_firewall" "agriops_fw" {
   name = "agriops-${var.environment}-fw"
 
-  droplet_ids = [
-    digitalocean_droplet.agriops_droplet.id
-  ]
+  droplet_ids = [digitalocean_droplet.agriops_droplet.id]
 
   inbound_rule {
     protocol         = "tcp"
@@ -44,8 +42,10 @@ resource "digitalocean_firewall" "agriops_fw" {
     destination_addresses = ["0.0.0.0/0", "::/0"]
   }
 }
+
+
 resource "digitalocean_spaces_bucket" "agriops_media" {
   name   = "agriops-${var.environment}-media"
-  region = "nyc3"
+  region = var.region
   acl    = "private"
 }
