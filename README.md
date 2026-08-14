@@ -18,11 +18,9 @@ Small-to-mid-scale farms and agri-cooperatives typically have no single source o
 ## Architecture
 
 Three independently containerized Node.js/Express APIs (`users-api`, `farms-api`, `orders-api`) and a React frontend, all served through an Nginx reverse proxy on a single DigitalOcean Droplet via Docker Compose.
+![Uploading agriops_linkedin_card.png…]()
 
-Browser → Nginx → ┬─ users-api → MySQL
-├─ farms-api → MySQL, DO Spaces (photos)
-├─ orders-api → MySQL, RabbitMQ
-└─ web (React SPA)
+
 
 Prometheus ← scrapes /metrics from each service
 Grafana ← visualizes Prometheus + Loki
